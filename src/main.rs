@@ -1,14 +1,21 @@
-use std::{fs::{self, OpenOptions}, io::{self, Write}, path::Path};
+use std::{fs::{self, OpenOptions}, io::{self, Write}, path::{Path, PathBuf}};
 
 mod helper;
 
+fn enter_path(printing: &str) -> PathBuf {
+    let mut path = String::new();
+    println!("{}", printing);
+    io::stdin().read_line(&mut path).expect("error reading input");
+    Path::new(path.trim()).join("main.rs")
+}   
+
 fn main() -> Result<(), io::Error> {
-    let path = Path::new("D:/Rust/old_mods/src/main.rs");
-    let write_to = Path::new("D:/Rust/form_old_mods/src/main.rs");
+    let path = enter_path("Enter the path of the src");
+    let write_to = enter_path("Enter the path of the new src folder (can't be the same)");
 
     fs::remove_dir_all(write_to.parent().unwrap())?;
     
-    write_file_recursive(path, write_to)?;
+    write_file_recursive(&path, &write_to)?;
 
     Ok(())
 }
