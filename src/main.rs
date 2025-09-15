@@ -13,6 +13,10 @@ fn main() -> Result<(), io::Error> {
     let path = enter_path("Enter the path of the src");
     let write_to = enter_path("Enter the path of the new src folder (can't be the same)");
 
+
+    if write_to == write_to {
+        return Err(io::Error::new(io::ErrorKind::InvalidInput, "Source and destionation is the same"));
+    }
     fs::remove_dir_all(write_to.parent().unwrap())?;
     
     write_file_recursive(&path, &write_to)?;
