@@ -11,13 +11,15 @@ fn enter_path(printing: &str) -> PathBuf {
 
 fn main() -> Result<(), io::Error> {
     let path = enter_path("Enter the path of the src");
-    let write_to = enter_path("Enter the path of the new src folder (can't be the same)");
-
-
-    if write_to == write_to {
+    let write_to = fs::canonicalize(Path::new("./"))?.join(format!("{}_reorganized", path.parent().unwrap().parent().unwrap().file_name().unwrap().to_str().unwrap())).join("main.rs");
+    
+    if path == write_to {
         return Err(io::Error::new(io::ErrorKind::InvalidInput, "Source and destionation is the same"));
     }
-    fs::remove_dir_all(write_to.parent().unwrap())?;
+
+    if write_to.is_dir() {
+        fs::remove_dir_all(write_to.parent().unwrap())?;
+    }
     
     write_file_recursive(&path, &write_to)?;
 
@@ -58,26 +60,17 @@ fn write_file_recursive(read_from: &Path, write_to: &Path) -> Result<(), io::Err
 
             if let Some(special_path) = special_path {
                 let path_to_read = fs::canonicalize(read_from_parent.join(special_path))?;
+
                 if let Ok(path_to_write) = path_to_read.strip_prefix(read_from_parent) {
                     let path_to_write = write_to_parent.join(path_to_write);
                     write_file_recursive(&path_to_read, &path_to_write)?;
                 } else {
-                    let target = helper::vec_from_path(&path_to_read);
-                    let from = helper::vec_from_path(read_from.parent().unwrap());
+                    let read_from_grand_parent = read_from.parent().unwrap().parent().unwrap();
 
-                    let mut path_to_write = write_to_parent.parent().unwrap().to_path_buf();
-                    let mut start_adding = false;
-
-                    for (index, component) in target.iter().enumerate() {
-                        if start_adding {
-                            path_to_write.push(component);
-                        } else if *component != from[index] {
-                            start_adding = true;
-                            path_to_write.push(component);
-                        }
+                    if let Ok(extra_path) = path_to_read.strip_prefix(&read_from_grand_parent) {
+                        let path_to_write = write_to_parent.parent().unwrap().join(extra_path);
+                        write_file_recursive(&path_to_read, &path_to_write)?;
                     }
-
-                    write_file_recursive(&path_to_read, &path_to_write)?;
                 }
             } else {
                 let path_to_read = read_from_parent.join(module_name).join("mod.rs");

@@ -1,4 +1,4 @@
-use std::path::{PathBuf, Path};
+use std::path::PathBuf;
   
     pub fn cut_off_between_strings(start: &str, end: &str, include_ending: bool, line: &mut String, range: Option<&(usize, usize)>) -> bool {
         if let Some(s) = line.find(start) {
@@ -110,12 +110,4 @@ use std::path::{PathBuf, Path};
         }
 
         None
-    }
-
-    pub fn vec_from_path(from: &Path) -> Vec<String> {
-        let mut vec = Vec::new();
-        for component in from.components() {
-           vec.push(component.as_os_str().to_str().unwrap().to_string()); 
-        }
-        vec
     }
