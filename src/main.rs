@@ -1,6 +1,5 @@
 use std::{fs::{self, OpenOptions}, io::{self, Write}, path::{Path, PathBuf}};
-
-mod helper;
+use rust_source_reorg::*;
 
 fn enter_path(printing: &str) -> PathBuf {
     let mut path = String::new();
@@ -43,10 +42,10 @@ fn write_file_recursive(read_from: &Path, write_to: &Path) -> Result<(), io::Err
 
         let mut block = block.trim().to_string();
         if block.is_empty() { continue; }
-        if helper::remove_comments(&mut block) { continue; }
-        helper::remove_scopes(&mut block);
-        let special_path = helper::handle_attributes(&mut block);
-        helper::cut_off_between_strings("pub", "mod", false, &mut block, None);
+        if remove_comments(&mut block) { continue; }
+        remove_scopes(&mut block);
+        let special_path = handle_attributes(&mut block);
+        cut_off_between_strings("pub", "mod", false, &mut block, None);
 
         if let Some(module_name) = block.strip_prefix("mod") {
             if !module_name.chars().next().unwrap().is_whitespace() {continue;}

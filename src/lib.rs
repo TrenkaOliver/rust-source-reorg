@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+    use std::path::PathBuf;
   
     pub fn cut_off_between_strings(start: &str, end: &str, include_ending: bool, line: &mut String, range: Option<&(usize, usize)>) -> bool {
         if let Some(s) = line.find(start) {
@@ -44,7 +44,7 @@ use std::path::PathBuf;
         line.is_empty()
     }
 
-    pub fn remove_comments_recrusive(line: &mut String, range: Option<&(usize, usize)>) -> bool {
+    fn remove_comments_recrusive(line: &mut String, range: Option<&(usize, usize)>) -> bool {
         if let Some(s) = line.find("/*") {
             if let Some((min, _)) = range { if s < *min {return false;}}
             let mut layer = 0;
